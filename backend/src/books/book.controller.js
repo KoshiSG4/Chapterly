@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const Book = require('./book.model');
 
 const postABook = async (req, res) => {
@@ -16,12 +17,20 @@ const postABook = async (req, res) => {
 
 const getAllBooks = async (req, res) => {
 	try {
-		const books = await Book.find().sort({ createdAt: -1 });
+		// const books = await Book.find().sort({ createdAt: -1 });
+		const page = parseInt(req.query.page) || 1;
+		const pageSize = 2;
+
+		const response = await axios.get('https://gutendex.com/books/');
+		const books = response.data.results;
+		const popularBooks = books
+			.sort((a, b) => b.download_count - a.download_count)
+			.slice(0, 50);
 		res.status(200).send({
-			books,
+			popularBooks,
 		});
 	} catch (error) {
-		console.log('Error fetching book', error);
+		console.log('Error fetching book', error.message);
 		res.status(500).send({ message: 'Failed to fetch books' });
 	}
 };

@@ -3,9 +3,9 @@ import App from '../App';
 import Home from '../pages/home/home';
 import Login from '../components/Login';
 import Register from '../components/Register';
-import Cart from '../pages/books/Cart';
+import Wishlist from '../pages/books/Wishlist';
 import Checkout from '../pages/books/Checkout';
-import SingleBook from '../pages/books/singleBook';
+import SingleBook from '../pages/books/SingleBook';
 
 const router = createBrowserRouter([
 	{
@@ -33,8 +33,8 @@ const router = createBrowserRouter([
 				element: <Register />,
 			},
 			{
-				path: '/cart',
-				element: <Cart />,
+				path: '/wishList',
+				element: <Wishlist />,
 			},
 			{
 				path: '/checkout',

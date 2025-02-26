@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import BookCard from '../books/bookCard';
+import axios from 'axios';
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -22,22 +23,24 @@ const categories = [
 ];
 
 const TopSellers = ({ book }) => {
-	// const [books, setBooks] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState('Choose a genre');
 
-	// useEffect(() => {
-	// 	fetch('books.json')
-	// 		.then((res) => res.json())
-	// 		.then((data) => setBooks(data));
-	// }, []);
+	// const { data: books = [] } = useFetchAllBooksQuery();
 
-	const { data: books = [] } = useFetchAllBooksQuery();
+	const { data } = useFetchAllBooksQuery();
+	const books = data?.popularBooks || [];
+
+	console.log(books);
 
 	const filteredBooks =
 		selectedCategory === 'Choose a genre'
 			? books
-			: books.filter(
-					(book) => book.category === selectedCategory.toLowerCase()
+			: books.filter((book) =>
+					book.bookshelves?.some((shelf) =>
+						shelf
+							.toLowerCase()
+							.includes(selectedCategory.toLowerCase())
+					)
 			  );
 
 	return (
@@ -83,11 +86,14 @@ const TopSellers = ({ book }) => {
 				modules={[Pagination, Navigation]}
 				className="mySwiper">
 				{filteredBooks.length > 0 &&
-					filteredBooks.map((book, index) => (
-						<SwiperSlide key={index}>
-							<BookCard book={book} />
-						</SwiperSlide>
-					))}
+					filteredBooks.map((book, index) => {
+						console.log('Book being passed to BookCard:', book);
+						return (
+							<SwiperSlide key={book.id}>
+								<BookCard book={book} />
+							</SwiperSlide>
+						);
+					})}
 			</Swiper>
 		</div>
 	);

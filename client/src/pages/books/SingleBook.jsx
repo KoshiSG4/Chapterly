@@ -1,20 +1,22 @@
-import React from 'react';
-import { FiShoppingCart } from 'react-icons/fi';
+import React, { useState } from 'react';
 import { useParams } from 'react-router';
 
 import { getImgUrl } from '../../utils/getImgUrl';
 import { useDispatch } from 'react-redux';
-import { addToCart } from '../../redux/features/cart/cartSlice';
 import { useFetchBookByIdQuery } from '../../redux/features/books/booksApi';
+import { addToWishList } from '../../redux/features/wishList/wishListSlice';
+import { BsBookmarkHeart, BsBookmarkHeartFill } from 'react-icons/bs';
 
 const SingleBook = () => {
+	const { wishListed, setWishListed } = useState(false);
 	const { id } = useParams();
 	const { data: book, isLoading, isError } = useFetchBookByIdQuery(id);
 
 	const dispatch = useDispatch();
 
-	const handleAddToCart = (product) => {
-		dispatch(addToCart(product));
+	const handleAddToWishList = (product) => {
+		setWishListed(!wishListed);
+		dispatch(addToWishList(product));
 	};
 
 	if (isLoading) return <div>Loading...</div>;
@@ -26,7 +28,7 @@ const SingleBook = () => {
 			<div className="">
 				<div>
 					<img
-						src={`${getImgUrl(book.coverImage)}`}
+						src={getImgUrl(book.formats['image/jpeg'])}
 						alt={book.title}
 						className="mb-8"
 					/>
@@ -44,15 +46,22 @@ const SingleBook = () => {
 						<strong>Category:</strong> {book?.category}
 					</p>
 					<p className="text-gray-700">
-						<strong>Description:</strong> {book.description}
+						<strong>Description:</strong> {book.summaries}
 					</p>
 				</div>
 
 				<button
-					onClick={() => handleAddToCart(book)}
+					onClick={() => handleAddToWishList(book)}
 					className="btn-primary px-6 space-x-1 flex items-center gap-1 ">
-					<FiShoppingCart className="" />
-					<span>Add to Cart</span>
+					{wishListed ? (
+						<BsBookmarkHeartFill className="text-red-500" />
+					) : (
+						<BsBookmarkHeart className="text-gray-500" />
+					)}
+
+					<span>
+						{wishListed ? 'Added to Wishlist' : 'Add to Wishlist'}
+					</span>
 				</button>
 			</div>
 		</div>
