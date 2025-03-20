@@ -21,7 +21,7 @@ Welcome to the **Chapterly E-Library** project! This is an ongoing project aimed
 To set up the project locally, follow these steps:
 
 **STEP 1 - Clone the repository:**
-git clone https://github.com/KoshiSG4/chapterly-elibrary.git
+git clone https://github.com/KoshiSG4/Chapterly.git
 
 **STEP 2 - Navigate to the project directory:**
 cd chapterly-elibrary
