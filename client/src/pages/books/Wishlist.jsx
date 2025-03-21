@@ -11,10 +11,6 @@ const Wishlist = () => {
 	const wishListItems = useSelector((state) => state.wishList.wishListItems);
 	const dispatch = useDispatch();
 
-	// const totalPrice = wishListItems
-	// 	.reduce((acc, item) => acc + item.newPrice, 0)
-	// 	.toFixed(2);
-
 	const handleRemoveFromWishlist = (product) => {
 		dispatch(removeFromWishList(product));
 	};
@@ -46,17 +42,20 @@ const Wishlist = () => {
 								<ul
 									role="list"
 									className="-my-6 divide-y divide-gray-200">
-									{wishListItems.map((product) => (
+									{wishListItems.map((book) => (
 										<li
-											key={product?._id}
+											key={book?.id}
 											className="flex py-6">
 											<div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
 												<img
 													alt=""
 													src={`${getImgUrl(
-														product?.coverImage
+														book?.formats[
+															'image/jpeg'
+														]
 													)}`}
-													className="h-full w-full object-cover object-center"
+													className="h-full w-full object-cover object-center hover:scale-105 bg-cover
+												 p-2 rounded-md cursor-pointer transition-all duration-200"
 												/>
 											</div>
 
@@ -64,31 +63,31 @@ const Wishlist = () => {
 												<div>
 													<div className="flex flex-wrap justify-between text-base font-medium text-gray-900">
 														<h3>
-															<Link to="/">
-																{product?.title}
+															<Link
+																to={`/books/${book.id}`}>
+																{book?.title}
 															</Link>
 														</h3>
-														<p className="sm:ml-4">
-															${product?.newPrice}
-														</p>
 													</div>
 													<p className="mt-1 text-sm text-gray-500 capitalize">
 														<strong>
-															Category:{' '}
-														</strong>
-														{product?.category}
+															Category:
+														</strong>{' '}
+														{book?.bookshelves?.map(
+															(shelf, index) => (
+																<li key={index}>
+																	{shelf}
+																</li>
+															)
+														)}
 													</p>
 												</div>
 												<div className="flex flex-1 flex-wrap items-end justify-between space-y-2 text-sm">
-													<p className="text-gray-500">
-														<strong>Qty:</strong> 1
-													</p>
-
 													<div className="flex">
 														<button
 															onClick={() =>
 																handleRemoveFromWishlist(
-																	product
+																	book
 																)
 															}
 															type="button"
@@ -102,34 +101,19 @@ const Wishlist = () => {
 									))}
 								</ul>
 							) : (
-								<p>No product found!</p>
+								<p>No books were found!</p>
 							)}
 						</div>
 					</div>
 				</div>
 
 				<div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-					<div className="flex justify-between text-base font-medium text-gray-900">
-						<p>Subtotal</p>
-						<p>${totalPrice ? totalPrice : 0}</p>
-					</div>
-					<p className="mt-0.5 text-sm text-gray-500">
-						Shipping and taxes calculated at checkout.
-					</p>
-					<div className="mt-6">
-						<Link
-							to="/checkout"
-							className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700">
-							Checkout
-						</Link>
-					</div>
 					<div className="mt-6 flex justify-center text-center text-sm text-gray-500">
 						<Link to="/">
-							or
 							<button
 								type="button"
 								className="font-medium text-indigo-600 hover:text-indigo-500 ml-1">
-								Continue Shopping
+								Continue Browsing
 								<span aria-hidden="true"> &rarr;</span>
 							</button>
 						</Link>

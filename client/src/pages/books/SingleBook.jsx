@@ -1,62 +1,82 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { getImgUrl } from '../../utils/getImgUrl';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useFetchBookByIdQuery } from '../../redux/features/books/booksApi';
-import { addToWishList } from '../../redux/features/wishList/wishListSlice';
+import {
+	addToWishList,
+	removeFromWishList,
+} from '../../redux/features/wishList/wishListSlice';
 import { BsBookmarkHeart, BsBookmarkHeartFill } from 'react-icons/bs';
 
 const SingleBook = () => {
-	const { wishListed, setWishListed } = useState(false);
+	const [wishListed, setWishListed] = useState(false);
 	const { id } = useParams();
-	const { data: book, isLoading, isError } = useFetchBookByIdQuery(id);
+	const { data, isLoading, isError } = useFetchBookByIdQuery(id);
+	const book = data?.book;
 
 	const dispatch = useDispatch();
+	const wishListItems = useSelector((state) => state.wishList.wishListItems);
 
-	const handleAddToWishList = (product) => {
+	useEffect(() => {
+		if (book) {
+			const isInWishList = wishListItems.some(
+				(item) => item.id === book.id
+			);
+			setWishListed(isInWishList);
+		}
+	}, [book, wishListItems]);
+
+	const handleToggleWishlist = () => {
+		if (wishListed) {
+			dispatch(removeFromWishList(book));
+			console.log('removed', book);
+		} else {
+			dispatch(addToWishList(book));
+			console.log('added', book);
+		}
 		setWishListed(!wishListed);
-		dispatch(addToWishList(product));
 	};
 
 	if (isLoading) return <div>Loading...</div>;
 	if (isError) return <div>Error happending to load book info</div>;
 	return (
 		<div className="max-w-lg shadow-md p-5">
-			<h1 className="text-2xl font-bold mb-6">{book.title}</h1>
+			<h1 className="text-2xl font-bold mb-6">{book?.title}</h1>
 
 			<div className="">
 				<div>
 					<img
-						src={getImgUrl(book.formats['image/jpeg'])}
-						alt={book.title}
+						src={getImgUrl(book?.formats['image/jpeg'])}
+						alt={book?.title}
 						className="mb-8"
 					/>
 				</div>
 
 				<div className="mb-5">
 					<p className="text-gray-700 mb-2">
-						<strong>Author:</strong> {book.author || 'admin'}
-					</p>
-					<p className="text-gray-700 mb-4">
-						<strong>Published:</strong>{' '}
-						{new Date(book?.createdAt).toLocaleDateString()}
+						<strong>Author:</strong>{' '}
+						{book?.authors?.[0]?.name || 'Unknown Author'}
 					</p>
 					<p className="text-gray-700 mb-4 capitalize">
-						<strong>Category:</strong> {book?.category}
+						<strong>Category:</strong>{' '}
+						{book?.bookshelves?.map((shelf, index) => (
+							<li key={index}>{shelf}</li>
+						))}
 					</p>
 					<p className="text-gray-700">
-						<strong>Description:</strong> {book.summaries}
+						<strong>Description:</strong> {book?.summaries}
 					</p>
 				</div>
 
 				<button
-					onClick={() => handleAddToWishList(book)}
-					className="btn-primary px-6 space-x-1 flex items-center gap-1 ">
+					onClick={() => handleToggleWishlist(book)}
+					className="btn-primary px-3 space-x-1 flex items-center gap-1 mt-auto ">
 					{wishListed ? (
-						<BsBookmarkHeartFill className="text-red-500" />
+						<BsBookmarkHeartFill className="text-blue-700 size-6" />
 					) : (
-						<BsBookmarkHeart className="text-gray-500" />
+						<BsBookmarkHeart className="text-gray-500 size-6" />
 					)}
 
 					<span>

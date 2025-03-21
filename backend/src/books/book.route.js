@@ -6,6 +6,8 @@ const {
 	getABook,
 	updateABook,
 	deleteABook,
+	fetchNews,
+	searchBooks,
 } = require('./book.controller');
 const router = express.Router();
 
@@ -14,6 +16,12 @@ router.post('/create-book', postABook);
 
 //get all books
 router.get('/', getAllBooks);
+
+//fetch news
+router.get('/news', fetchNews);
+
+//search books
+router.get('/search', searchBooks);
 
 //get a book
 router.get('/:id', getABook);

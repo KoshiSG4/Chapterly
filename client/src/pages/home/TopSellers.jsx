@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import BookCard from '../books/bookCard';
+import BookCard from '../books/BookCard';
 import axios from 'axios';
 
 // Import Swiper React components
@@ -14,23 +14,13 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useFetchAllBooksQuery } from '../../redux/features/books/booksApi';
 
-const categories = [
-	'Choose a genre',
-	'Business',
-	'Fiction',
-	'Horror',
-	'Adventure',
-];
+const categories = ['Choose a genre', 'Science', 'Fiction', 'Crime', 'History'];
 
 const TopSellers = ({ book }) => {
 	const [selectedCategory, setSelectedCategory] = useState('Choose a genre');
 
-	// const { data: books = [] } = useFetchAllBooksQuery();
-
 	const { data } = useFetchAllBooksQuery();
 	const books = data?.popularBooks || [];
-
-	console.log(books);
 
 	const filteredBooks =
 		selectedCategory === 'Choose a genre'
@@ -87,7 +77,6 @@ const TopSellers = ({ book }) => {
 				className="mySwiper">
 				{filteredBooks.length > 0 &&
 					filteredBooks.map((book, index) => {
-						console.log('Book being passed to BookCard:', book);
 						return (
 							<SwiperSlide key={book.id}>
 								<BookCard book={book} />

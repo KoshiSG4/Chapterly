@@ -9,7 +9,7 @@ function App() {
 		<>
 			<AuthProvider>
 				<Navbar />
-				<main className="min-h-screen max-w-screen-2xl mx-auto px-20 py-6 font-primary">
+				<main className="min-h-screen max-w-screen-2xl mx-auto px-20 pb-6 font-primary">
 					<Outlet />
 				</main>
 				<Footer />
