@@ -11,10 +11,11 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import BookCard from '../books/BookCard';
 import { useFetchAllBooksQuery } from '../../redux/features/books/booksApi';
+import { useSelector } from 'react-redux';
 
 function Recommended() {
-	const { data } = useFetchAllBooksQuery();
-	const books = data?.popularBooks || [];
+	const { allBooks } = useSelector((state) => state.bookList);
+	const books = allBooks?.popularBooks || [];
 
 	return (
 		<div className="py-16">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BsBookmarkHeart, BsBookmarkHeartFill } from 'react-icons/bs';
 import { RiArrowDropDownLine } from 'react-icons/ri';
 import { LuBookCheck } from 'react-icons/lu';
@@ -18,6 +18,7 @@ import {
 	addToCompletedList,
 	removeFromCompletedList,
 } from '../../redux/features/completedList/completedListSlice';
+import { setSelectedBook } from '../../redux/bookSlice';
 
 const BookCard = ({ book }) => {
 	const dispatch = useDispatch();
@@ -34,11 +35,12 @@ const BookCard = ({ book }) => {
 	const completedListItems = useSelector(
 		(state) => state.completedList.completedListItems
 	);
+	const ref = useRef(null);
 
 	const options = [
 		'Add to Wishlist',
 		'Currently Reading',
-		'Completed Reading',
+		'Finished Reading',
 	];
 
 	useEffect(() => {
@@ -51,12 +53,23 @@ const BookCard = ({ book }) => {
 				completedListItems.some((item) => item.id === book.id)
 			);
 		}
+
+		const handleClickOutside = (event) => {
+			if (ref.current && !ref.current.contains(event.target)) {
+				setIsOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', handleClickOutside);
+		return () =>
+			document.removeEventListener('mousedown', handleClickOutside);
 	}, [book, wishListItems, readingListItems, completedListItems]);
 
 	const handleToggleWishlist = () => {
 		if (wishListed) {
 			dispatch(removeFromWishList(book));
 		} else {
+			dispatch(removeFromCompletedList(book));
+			dispatch(removeFromReadingList(book));
 			dispatch(addToWishList(book));
 		}
 		setWishListed(!wishListed);
@@ -65,6 +78,8 @@ const BookCard = ({ book }) => {
 		if (readingList) {
 			dispatch(removeFromReadingList(book));
 		} else {
+			dispatch(removeFromWishList(book));
+			dispatch(removeFromCompletedList(book));
 			dispatch(addToReadingList(book));
 		}
 		setReadingList(!readingList);
@@ -73,6 +88,8 @@ const BookCard = ({ book }) => {
 		if (completedList) {
 			dispatch(removeFromCompletedList(book));
 		} else {
+			dispatch(removeFromReadingList(book));
+			dispatch(removeFromWishList(book));
 			dispatch(addToCompletedList(book));
 		}
 		setCompletedList(!completedList);
@@ -84,7 +101,7 @@ const BookCard = ({ book }) => {
 			handleToggleWishlist(book);
 		} else if (option === 'Currently Reading') {
 			handleToggleReadingList(book);
-		} else if (option === 'Completed Reading') {
+		} else if (option === 'Finished Reading') {
 			handleToggleCompletedList(book);
 		}
 		setIsOpen(false);
@@ -96,6 +113,7 @@ const BookCard = ({ book }) => {
 				<div className="w-52 h-80 sm:h-80 sm:flex-shrink-0 border rounded-md p-2 shadow-md ">
 					<Link to={`/books/${book.id}`}>
 						<img
+							onClick={() => dispatch(setSelectedBook(book))}
 							src={getImgUrl(book.formats['image/jpeg'])}
 							alt={book.title}
 							className="bg-cover rounded-md cursor-pointer hover:scale-105 transition-transform duration-200 object-cover"
@@ -103,21 +121,23 @@ const BookCard = ({ book }) => {
 					</Link>
 				</div>
 
-				<div className="flex flex-col sm:h-72 justify-between">
+				<div className="flex flex-col sm:h-72 justify-between ">
 					<Link to={`/books/${book.id}`}>
-						<h3 className="text-base font-semibold hover:text-blue-600 mb-3">
+						<h3
+							className="text-base font-semibold hover:text-blue-600 mb-3"
+							onClick={() => dispatch(setSelectedBook(book))}>
 							{book?.title?.length > 30
 								? `${book?.title.slice(0, 40)}...`
 								: book?.title}
 						</h3>
 					</Link>
 					<p className="text-sm text-gray-600 mb-5">
-						{book?.summaries?.[0]
-							? `${book?.summaries[0].slice(0, 130)}...`
-							: book?.summaries?.[0]}
+						{book?.summary
+							? `${book?.summary.slice(0, 130)}...`
+							: book?.summary}
 					</p>
 					{/* combined split button */}
-					<div className="inline-flex rounded-md shadow-sm w-full">
+					<div className="inline-flex rounded-md shadow-sm w-full text-base font-semibold bg-yellow-500 p-3 hover:bg-[#0b1360] hover:text-white">
 						{/* Main Button */}
 						<button
 							onClick={() => {
@@ -129,7 +149,7 @@ const BookCard = ({ book }) => {
 									handleToggleWishlist(book);
 								}
 							}}
-							className="flex items-center gap-1 btn-primary px-3 mt-auto">
+							className="flex items-center text-sm gap-1  mt-auto">
 							{completedList ? (
 								<LuBookCheck className="text-blue-700 size-6" />
 							) : readingList ? (
@@ -142,7 +162,7 @@ const BookCard = ({ book }) => {
 
 							<span>
 								{completedList
-									? 'Completed Reading'
+									? 'Finished Reading'
 									: readingList
 									? 'Currently Reading'
 									: wishListed
@@ -156,26 +176,32 @@ const BookCard = ({ book }) => {
 							onClick={() => {
 								setIsOpen(!isOpen);
 							}}
-							className="relative flex items-center justify-center gap-1 btn-primary px-3 ">
-							<RiArrowDropDownLine className="ml-2 size-6" />
+							className="relative flex items-center justify-center cursor-pointer">
+							<RiArrowDropDownLine
+								className={`size-6 transition-transform duration-300 ease-in-out ${
+									isOpen ? 'rotate-180' : 'rotate-0'
+								}`}
+							/>
 						</button>
-						{isOpen && (
-							<div className="absolute bottom-1/4 right-0 mb-1 w-40 bg-slate-200 rounded-lg shadow-lg z-10">
-								{options.map((option) => (
-									<button
-										key={option}
-										onClick={() => handleSelect(option)}
-										className={`block w-full px-4 py-2 text-left hover:bg-gray-100 ${
-											option === selectedOption
-												? 'bg-gray-200 font-semibold'
-												: ''
-										}`}>
-										{option}
-									</button>
-								))}
-							</div>
-						)}
 					</div>
+					{isOpen && (
+						<div
+							ref={ref}
+							className="absolute bottom-1/4 right-0  w-40 font-medium bg-[#abaaaa] rounded-lg shadow-lg z-10">
+							{options.map((option) => (
+								<button
+									key={option}
+									onClick={() => handleSelect(option)}
+									className={`block w-full px-4 py-2 text-left text-sm h-12  hover:bg-[#e1e1e1] hover:text-black   hover:font-semibold ${
+										option === selectedOption
+											? 'bg-gray-200 font-semibold'
+											: ''
+									}`}>
+									{option}
+								</button>
+							))}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>

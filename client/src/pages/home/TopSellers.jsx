@@ -13,14 +13,22 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { useFetchAllBooksQuery } from '../../redux/features/books/booksApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllBooks } from '../../redux/bookSlice';
+import store from '../../redux/store';
 
 const categories = ['Choose a genre', 'Science', 'Fiction', 'Crime', 'History'];
 
 const TopSellers = ({ book }) => {
 	const [selectedCategory, setSelectedCategory] = useState('Choose a genre');
+	const { allBooks } = useSelector((state) => state.bookList);
 
-	const { data } = useFetchAllBooksQuery();
-	const books = data?.popularBooks || [];
+	const books = allBooks?.popularBooks || [];
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		dispatch(getAllBooks());
+	}, [dispatch]);
 
 	const filteredBooks =
 		selectedCategory === 'Choose a genre'

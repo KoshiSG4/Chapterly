@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 
 import { getImgUrl } from '../../utils/getImgUrl';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,82 +9,152 @@ import {
 	removeFromWishList,
 } from '../../redux/features/wishList/wishListSlice';
 import { BsBookmarkHeart, BsBookmarkHeartFill } from 'react-icons/bs';
+import { LuChevronsRight } from 'react-icons/lu';
+import axios from 'axios';
+import getBaseUrl from '../../utils/baseURL';
+// import { Dialog, DialogContent, DialogTitle } from '@radix-ui/react-dialog';
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from '../../components/ui/dialog';
 
 const SingleBook = () => {
 	const [wishListed, setWishListed] = useState(false);
+	const [openBook, setOpenBook] = useState(false);
+	const [bookText, setBookText] = useState(null);
+	const [bookTextIsLoading, setBookTextIsLoading] = useState(false);
 	const { id } = useParams();
-	const { data, isLoading, isError } = useFetchBookByIdQuery(id);
-	const book = data?.book;
+	// const { data, isLoading, isError } = useFetchBookByIdQuery(id);
+	const { selectedBook, loading, error } = useSelector(
+		(state) => state.bookList
+	);
 
 	const dispatch = useDispatch();
 	const wishListItems = useSelector((state) => state.wishList.wishListItems);
 
 	useEffect(() => {
-		if (book) {
+		if (selectedBook) {
 			const isInWishList = wishListItems.some(
-				(item) => item.id === book.id
+				(item) => item.id === selectedBook.id
 			);
 			setWishListed(isInWishList);
 		}
-	}, [book, wishListItems]);
+	}, [selectedBook, wishListItems]);
 
 	const handleToggleWishlist = () => {
 		if (wishListed) {
-			dispatch(removeFromWishList(book));
-			console.log('removed', book);
+			dispatch(removeFromWishList(selectedBook));
+			console.log('removed', selectedBook);
 		} else {
-			dispatch(addToWishList(book));
-			console.log('added', book);
+			dispatch(addToWishList(selectedBook));
+			console.log('added', selectedBook);
 		}
 		setWishListed(!wishListed);
 	};
 
-	if (isLoading) return <div>Loading...</div>;
-	if (isError) return <div>Error happending to load book info</div>;
+	const handleContinueReading = async (selectedBook) => {
+		const response = await axios.get(
+			`${getBaseUrl()}/api/books/${selectedBook.id}/getText`
+		);
+		setBookText(response.data);
+		console.log(bookText);
+		setOpenBook(true);
+	};
+
+	if (loading) return <div>Loading...</div>;
+	if (error) return <div>Error happending to load book info</div>;
 	return (
-		<div className="max-w-lg shadow-md p-5">
-			<h1 className="text-2xl font-bold mb-6">{book?.title}</h1>
+		<>
+			<div className="max-w-6xl mx-auto shadow-md p-10">
+				<h1 className="text-2xl font-bold mb-6 ">
+					{selectedBook?.title}
+				</h1>
 
-			<div className="">
-				<div>
-					<img
-						src={getImgUrl(book?.formats['image/jpeg'])}
-						alt={book?.title}
-						className="mb-8"
-					/>
+				{/* 2-column layout */}
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+					{/* Left Column - Image and Details */}
+					<div>
+						<img
+							src={getImgUrl(selectedBook?.formats['image/jpeg'])}
+							alt={selectedBook?.title}
+							className="mb-6 rounded-md shadow-sm w-64 h-auto object-cover "
+						/>
+
+						<div className="mb-5">
+							<p className="text-gray-700 mb-2">
+								<strong>Author:</strong>{' '}
+								{selectedBook?.authors?.[0]?.name ||
+									'Unknown Author'}
+							</p>
+
+							<div className="text-gray-700 mb-4">
+								<strong>Category:</strong>
+								<ul className="list-disc list-inside capitalize mt-1 ml-2">
+									{selectedBook?.bookshelves?.length ? (
+										selectedBook.bookshelves.map(
+											(shelf, index) => (
+												<li key={index}>{shelf}</li>
+											)
+										)
+									) : (
+										<li>Uncategorized</li>
+									)}
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					{/* Right Column - Summary */}
+					<div className="text-gray-800 leading-relaxed">
+						<h2 className="text-xl font-semibold mb-3">Summary</h2>
+						<p>
+							{selectedBook?.summary ||
+								'No summary available for this book.'}
+						</p>
+						<button
+							onClick={() => handleContinueReading(selectedBook)}
+							className="flex items-center text-blue-500 hover:text-blue-600 font-medium transition-colors">
+							<span>Continue Reading...</span>
+							<LuChevronsRight className="ml-1 size-4" />
+						</button>
+						<div className="flex flex-wrap gap-4 mt-8">
+							<button
+								onClick={() =>
+									handleToggleWishlist(selectedBook)
+								}
+								className="font-semibold bg-yellow-500 p-3 py-2 hover:bg-[#0b1360] hover:text-white rounded-lg flex items-center gap-2">
+								{wishListed ? (
+									<BsBookmarkHeartFill className="text-blue-700 size-5" />
+								) : (
+									<BsBookmarkHeart className="text-gray-500 size-5" />
+								)}
+								<span>
+									{wishListed
+										? 'Added to Wishlist'
+										: 'Add to Wishlist'}
+								</span>
+							</button>
+						</div>
+					</div>
 				</div>
-
-				<div className="mb-5">
-					<p className="text-gray-700 mb-2">
-						<strong>Author:</strong>{' '}
-						{book?.authors?.[0]?.name || 'Unknown Author'}
-					</p>
-					<p className="text-gray-700 mb-4 capitalize">
-						<strong>Category:</strong>{' '}
-						{book?.bookshelves?.map((shelf, index) => (
-							<li key={index}>{shelf}</li>
-						))}
-					</p>
-					<p className="text-gray-700">
-						<strong>Description:</strong> {book?.summaries}
-					</p>
-				</div>
-
-				<button
-					onClick={() => handleToggleWishlist(book)}
-					className="btn-primary px-3 space-x-1 flex items-center gap-1 mt-auto ">
-					{wishListed ? (
-						<BsBookmarkHeartFill className="text-blue-700 size-6" />
-					) : (
-						<BsBookmarkHeart className="text-gray-500 size-6" />
-					)}
-
-					<span>
-						{wishListed ? 'Added to Wishlist' : 'Add to Wishlist'}
-					</span>
-				</button>
 			</div>
-		</div>
+
+			<Dialog open={openBook} onOpenChange={setOpenBook}>
+				<DialogContent className="max-w-[90%] max-h-full overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle className="text-xl font-semibold">
+							{selectedBook?.title}
+						</DialogTitle>
+					</DialogHeader>
+
+					<pre className="whitespace-pre-wrap text-gray-800 leading-relaxed font-serif mt-4">
+						{bookText}
+					</pre>
+				</DialogContent>
+			</Dialog>
+		</>
 	);
 };
 

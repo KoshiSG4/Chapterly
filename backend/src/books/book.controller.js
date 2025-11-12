@@ -17,9 +17,23 @@ const postABook = async (req, res) => {
 	}
 };
 
+const options = {
+	method: 'GET',
+	url: 'https://project-gutenberg-free-books-api1.p.rapidapi.com/books',
+	headers: {
+		'x-rapidapi-key': 'abba6cf16emsh32cf580ac9093e1p1823f8jsna72e9e248b91',
+		'x-rapidapi-host': 'project-gutenberg-free-books-api1.p.rapidapi.com',
+	},
+};
+
 const getAllBooks = async (req, res) => {
 	try {
-		const response = await axios.get('https://gutendex.com/books/');
+		const response = await axios.get(process.env.BOOKS_URL, {
+			headers: {
+				'x-rapidapi-key': process.env.X_RAPIDAPI_KEY,
+				'x-rapidapi-host': process.env.X_RAPIDAPI_HOST,
+			},
+		});
 		const books = response.data.results;
 		const popularBooks = books
 			.sort((a, b) => b.download_count - a.download_count)
@@ -30,6 +44,25 @@ const getAllBooks = async (req, res) => {
 	} catch (error) {
 		console.log('Error fetching book', error.message);
 		res.status(500).send({ message: 'Failed to fetch books' });
+	}
+};
+const getBookText = async (req, res) => {
+	try {
+		const id = req.params.id;
+		const response = await axios.get(
+			`${process.env.BOOKS_URL}/${id}/text`,
+			{
+				headers: {
+					'x-rapidapi-key': process.env.X_RAPIDAPI_KEY,
+					'x-rapidapi-host': process.env.X_RAPIDAPI_HOST,
+				},
+			}
+		);
+		const bookText = response.data.text;
+		res.status(200).send(response.data.text);
+	} catch (error) {
+		console.log('Error fetching book', error.message);
+		res.status(500).send({ message: 'Failed to fetch the book text' });
 	}
 };
 
@@ -133,6 +166,7 @@ const fetchNews = async (req, res) => {
 module.exports = {
 	postABook,
 	getAllBooks,
+	getBookText,
 	searchBooks,
 	getABook,
 	updateABook,
