@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router';
 import App from '../App';
-import Home from '../pages/home/home';
+import Home from '../pages/home/Home';
 import Login from '../components/Login';
 import Register from '../components/Register';
 import Wishlist from '../pages/books/Wishlist';
