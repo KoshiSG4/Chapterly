@@ -33,7 +33,7 @@ To set up the project locally, follow these steps:
 git clone https://github.com/KoshiSG4/Chapterly.git
 
 **STEP 2 - Navigate to the project directory:**
-cd chapterly-elibrary
+cd chapterly
 
 **STEP 3 - Install dependencies:**
 npm install
