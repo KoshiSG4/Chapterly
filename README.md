@@ -2,6 +2,11 @@
 
 Welcome to the **Chapterly E-Library** project! This is an ongoing project aimed at creating a web-based platform where users can explore, read, and manage their books. The platform will include features like account creation, managing wishlists, tracking reading progress, and leaving reviews.
 
+
+## 🌐 Live Demo
+🔗 [View Deployed App](https://chapterly-alpha.vercel.app)
+
+
 ## 🚧 **Project Status**
 **Chapterly** is currently under development. 
 
