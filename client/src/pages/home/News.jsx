@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 // Import Swiper React components
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -13,10 +13,18 @@ import 'swiper/css/navigation';
 
 import { Link } from 'react-router';
 import { useFetchNewsQuery } from '../../redux/features/books/booksApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNews } from '../../redux/bookSlice';
 
 const News = () => {
-	const { data } = useFetchNewsQuery();
-	const news = data?.news || [];
+	const { news } = useSelector((state) => state.bookList);
+	const dispatch = useDispatch();
+
+	useEffect(() => {
+		dispatch(fetchNews());
+	}, []);
+
+	const newsList = news || [];
 
 	return (
 		<div className="py-16">
@@ -46,7 +54,7 @@ const News = () => {
 				}}
 				modules={[Pagination, Navigation]}
 				className="mySwiper">
-				{news.map((item, index) => (
+				{newsList.map((item, index) => (
 					<SwiperSlide key={index}>
 						<div className="flex flex-col sm:flex-row sm:justify-between sm:h-72  items-start gap-12">
 							{/* content */}

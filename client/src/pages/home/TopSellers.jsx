@@ -23,7 +23,7 @@ const TopSellers = ({ book }) => {
 	const [selectedCategory, setSelectedCategory] = useState('Choose a genre');
 	const { allBooks } = useSelector((state) => state.bookList);
 
-	const books = allBooks?.popularBooks || [];
+	const books = allBooks || [];
 	const dispatch = useDispatch();
 
 	useEffect(() => {

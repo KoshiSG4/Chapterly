@@ -15,7 +15,7 @@ import { useSelector } from 'react-redux';
 
 function Recommended() {
 	const { allBooks } = useSelector((state) => state.bookList);
-	const books = allBooks?.popularBooks || [];
+	const books = allBooks || [];
 
 	return (
 		<div className="py-16">

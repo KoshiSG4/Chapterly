@@ -19,6 +19,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '../../components/ui/dialog';
+import { getBookText } from '../../redux/bookSlice';
 
 const SingleBook = () => {
 	const [wishListed, setWishListed] = useState(false);
@@ -55,9 +56,10 @@ const SingleBook = () => {
 	};
 
 	const handleContinueReading = async (selectedBook) => {
-		const response = await axios.get(
-			`${getBaseUrl()}/api/books/${selectedBook.id}/getText`
-		);
+		// const response = await axios.get(
+		// 	`${getBaseUrl()}/api/books/${selectedBook.id}/getText`
+		// );
+		dispatch(getBookText(selectedBook.id));
 		setBookText(response.data);
 		console.log(bookText);
 		setOpenBook(true);
