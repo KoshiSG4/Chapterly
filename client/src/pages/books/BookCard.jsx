@@ -137,7 +137,7 @@ const BookCard = ({ book }) => {
 							: book?.summary}
 					</p>
 					{/* combined split button */}
-					<div className="inline-flex rounded-md shadow-sm w-full text-base font-semibold bg-yellow-600 p-3 hover:bg-[#0b1360] hover:text-white">
+					<div className="inline-flex rounded-md shadow-sm w-full text-base font-semibold bg-yellow-500 p-3 hover:bg-[#0b1360] hover:text-white">
 						{/* Main Button */}
 						<button
 							onClick={() => {
