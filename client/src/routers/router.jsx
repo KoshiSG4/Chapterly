@@ -7,7 +7,7 @@ import Wishlist from '../pages/books/Wishlist';
 import SingleBook from '../pages/books/SingleBook';
 import SearchedBooks from '../pages/books/SearchedBooks';
 import ReadingList from '../pages/books/ReadingList';
-import CompletedList from '../pages/books/completedList';
+import CompletedList from '../pages/books/CompletedList';
 
 const router = createBrowserRouter([
 	{
