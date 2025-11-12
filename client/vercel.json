@@ -6,5 +6,11 @@
 			"config": { "distDir": "dist" }
 		}
 	],
-	"routes": [{ "src": "/(.*)", "dest": "client/dist/$1" }]
+	"routes": [{ "src": "/(.*)", "dest": "client/dist/$1" }],
+	"rewrites": [
+		{
+			"source": "/(.*)",
+			"destination": "/index.html"
+		}
+	]
 }
